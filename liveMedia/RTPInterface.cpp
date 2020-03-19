@@ -125,7 +125,7 @@ RTPInterface::RTPInterface(Medium* owner, Groupsock* gs)
   // even if the socket was previously reported (e.g., by "select()") as having data available.
   // (This can supposedly happen if the UDP checksum fails, for example.)
   makeSocketNonBlocking(fGS->socketNum());
-  increaseSendBufferTo(envir(), fGS->socketNum(), 64*1024);
+  increaseSendBufferTo(envir(), fGS->socketNum(), 50*1024);
 }
 
 RTPInterface::~RTPInterface() {
@@ -330,17 +330,9 @@ Boolean RTPInterface::sendRTPorRTCPPacketOverTCP(u_int8_t* packet, unsigned pack
     framingHeader[1] = streamChannelId;
     framingHeader[2] = (u_int8_t) ((packetSize&0xFF00)>>8);
     framingHeader[3] = (u_int8_t) (packetSize&0xFF);
-#if 0
     if (!sendDataOverTCP(socketNum, framingHeader, 4, False)) break;
+
     if (!sendDataOverTCP(socketNum, packet, packetSize, True)) break;
-#else
-    struct iovec iov[2];
-    iov[0].iov_base = framingHeader;
-    iov[0].iov_len  = 4;
-    iov[1].iov_base = packet;
-    iov[1].iov_len  = packetSize;
-    writev(socketNum, iov, 2);
-#endif
 #ifdef DEBUG_SEND
     fprintf(stderr, "sendRTPorRTCPPacketOverTCP: completed\n"); fflush(stderr);
 #endif

@@ -35,7 +35,7 @@ void MultiFramedRTPSink::setPacketSizes(unsigned preferredPacketSize,
 }
 
 #ifndef RTP_PAYLOAD_MAX_SIZE
-#define RTP_PAYLOAD_MAX_SIZE 2048
+#define RTP_PAYLOAD_MAX_SIZE 1456
       // Default max packet size (1500, minus allowance for IP, UDP, UMTP headers)
       // (Also, make it a multiple of 4 bytes, just in case that matters.)
 #endif
@@ -400,7 +400,7 @@ void MultiFramedRTPSink::sendPacketIfNecessary() {
     // We're done:
     onSourceClosure();
   } else {
-#if 0
+#if 1
     // We have more frames left to send.  Figure out when the next frame
     // is due to start playing, then make sure that we wait this long before
     // sending the next packet.

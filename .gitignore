@@ -3,6 +3,11 @@ _install/
 Makefile
 *.o
 *.a
+*.obj
+*.exe
+*.lib
+*.mak
+*.exe.*
 /mediaServer/live555MediaServer
 /proxyServer/live555ProxyServer
 /testProgs/MPEG2TransportStreamIndexer

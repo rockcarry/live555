@@ -400,7 +400,7 @@ void MultiFramedRTPSink::sendPacketIfNecessary() {
     // We're done:
     onSourceClosure();
   } else {
-#if 1
+#if 0
     // We have more frames left to send.  Figure out when the next frame
     // is due to start playing, then make sure that we wait this long before
     // sending the next packet.

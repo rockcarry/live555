@@ -267,6 +267,11 @@ int setupStreamSocket(UsageEnvironment& env,
     return newSocket;
   }
 
+#ifdef ENABLE_TCP_NODELAY
+  int enable = 1;
+  setsockopt(newSocket, IPPROTO_TCP, TCP_NODELAY, (void*)&enable, sizeof(enable));
+#endif
+
   int reuseFlag = groupsockPriv(env)->reuseFlag;
   reclaimGroupsockPriv(env);
   if (setsockopt(newSocket, SOL_SOCKET, SO_REUSEADDR,

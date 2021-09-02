@@ -251,9 +251,9 @@ void RTPInterface
 }
 
 Boolean RTPInterface::handleRead(unsigned char* buffer, unsigned bufferMaxSize,
-				 unsigned& bytesRead, struct sockaddr_in& fromAddress,
-				 int& tcpSocketNum, unsigned char& tcpStreamChannelId,
-				 Boolean& packetReadWasIncomplete) {
+                                 unsigned& bytesRead, struct sockaddr_in& fromAddress,
+                                 int& tcpSocketNum, unsigned char& tcpStreamChannelId,
+                                 Boolean& packetReadWasIncomplete) {
   packetReadWasIncomplete = False; // by default
   Boolean readSuccess;
   if (fNextTCPReadStreamSocketNum < 0) {
@@ -271,8 +271,8 @@ Boolean RTPInterface::handleRead(unsigned char* buffer, unsigned bufferMaxSize,
     unsigned curBytesToRead = totBytesToRead;
     int curBytesRead;
     while ((curBytesRead = readSocket(envir(), fNextTCPReadStreamSocketNum,
-				      &buffer[bytesRead], curBytesToRead,
-				      fromAddress)) > 0) {
+                                      &buffer[bytesRead], curBytesToRead,
+                                      fromAddress)) > 0) {
       bytesRead += curBytesRead;
       if (bytesRead >= totBytesToRead) break;
       curBytesToRead -= curBytesRead;
@@ -314,10 +314,10 @@ void RTPInterface::stopNetworkReading() {
 ////////// Helper Functions - Implementation /////////
 
 Boolean RTPInterface::sendRTPorRTCPPacketOverTCP(u_int8_t* packet, unsigned packetSize,
-						 int socketNum, unsigned char streamChannelId) {
+                                                 int socketNum, unsigned char streamChannelId) {
 #ifdef DEBUG_SEND
   fprintf(stderr, "sendRTPorRTCPPacketOverTCP: %d bytes over channel %d (socket %d)\n",
-	  packetSize, streamChannelId, socketNum); fflush(stderr);
+          packetSize, streamChannelId, socketNum); fflush(stderr);
 #endif
   // Send a RTP/RTCP packet over TCP, using the encoding defined in RFC 2326, section 10.12:
   //     $<streamChannelId><packetSize><packet>
@@ -442,13 +442,13 @@ SocketDescriptor::~SocketDescriptor() {
 }
 
 void SocketDescriptor::registerRTPInterface(unsigned char streamChannelId,
-					    RTPInterface* rtpInterface) {
+                                            RTPInterface* rtpInterface) {
   Boolean isFirstRegistration = fSubChannelHashTable->IsEmpty();
 #if defined(DEBUG_SEND)||defined(DEBUG_RECEIVE)
   fprintf(stderr, "SocketDescriptor(socket %d)::registerRTPInterface(channel %d): isFirstRegistration %d\n", fOurSocketNum, streamChannelId, isFirstRegistration);
 #endif
   fSubChannelHashTable->Add((char const*)(long)streamChannelId,
-			    rtpInterface);
+                            rtpInterface);
 
   if (isFirstRegistration) {
     // Arrange to handle reads on this TCP socket:
@@ -499,7 +499,7 @@ Boolean SocketDescriptor::tcpReadHandler1(int mask) {
   //   a 2-byte packet size (in network byte order)
   //   the packet data.
   // However, because the socket is being read asynchronously, this data might arrive in pieces.
-  
+
   u_int8_t c;
   struct sockaddr_in fromAddress;
   if (fTCPReadingState != AWAITING_PACKET_DATA) {
@@ -521,29 +521,29 @@ Boolean SocketDescriptor::tcpReadHandler1(int mask) {
     case AWAITING_DOLLAR: {
       if (c == '$') {
 #ifdef DEBUG_RECEIVE
-	fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): Saw '$'\n", fOurSocketNum);
+        fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): Saw '$'\n", fOurSocketNum);
 #endif
-	fTCPReadingState = AWAITING_STREAM_CHANNEL_ID;
+        fTCPReadingState = AWAITING_STREAM_CHANNEL_ID;
       } else {
-	// This character is part of a RTSP request or command, which is handled separately:
-	if (fServerRequestAlternativeByteHandler != NULL && c != 0xFF && c != 0xFE) {
-	  // Hack: 0xFF and 0xFE are used as special signaling characters, so don't send them
-	  (*fServerRequestAlternativeByteHandler)(fServerRequestAlternativeByteHandlerClientData, c);
-	}
+        // This character is part of a RTSP request or command, which is handled separately:
+        if (fServerRequestAlternativeByteHandler != NULL && c != 0xFF && c != 0xFE) {
+          // Hack: 0xFF and 0xFE are used as special signaling characters, so don't send them
+          (*fServerRequestAlternativeByteHandler)(fServerRequestAlternativeByteHandlerClientData, c);
+        }
       }
       break;
     }
     case AWAITING_STREAM_CHANNEL_ID: {
       // The byte that we read is the stream channel id.
       if (lookupRTPInterface(c) != NULL) { // sanity check
-	fStreamChannelId = c;
-	fTCPReadingState = AWAITING_SIZE1;
+        fStreamChannelId = c;
+        fTCPReadingState = AWAITING_SIZE1;
       } else {
-	// This wasn't a stream channel id that we expected.  We're (somehow) in a strange state.  Try to recover:
+        // This wasn't a stream channel id that we expected.  We're (somehow) in a strange state.  Try to recover:
 #ifdef DEBUG_RECEIVE
-	fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): Saw nonexistent stream channel id: 0x%02x\n", fOurSocketNum, c);
+        fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): Saw nonexistent stream channel id: 0x%02x\n", fOurSocketNum, c);
 #endif
-	fTCPReadingState = AWAITING_DOLLAR;
+        fTCPReadingState = AWAITING_DOLLAR;
       }
       break;
     }
@@ -556,13 +556,13 @@ Boolean SocketDescriptor::tcpReadHandler1(int mask) {
     case AWAITING_SIZE2: {
       // The byte that we read is the second (low) byte of the 16-bit RTP or RTCP packet 'size'.
       unsigned short size = (fSizeByte1<<8)|c;
-      
+
       // Record the information about the packet data that will be read next:
       RTPInterface* rtpInterface = lookupRTPInterface(fStreamChannelId);
       if (rtpInterface != NULL) {
-	rtpInterface->fNextTCPReadSize = size;
-	rtpInterface->fNextTCPReadStreamSocketNum = fOurSocketNum;
-	rtpInterface->fNextTCPReadStreamChannelId = fStreamChannelId;
+        rtpInterface->fNextTCPReadSize = size;
+        rtpInterface->fNextTCPReadStreamSocketNum = fOurSocketNum;
+        rtpInterface->fNextTCPReadStreamChannelId = fStreamChannelId;
       }
       fTCPReadingState = AWAITING_PACKET_DATA;
       break;
@@ -573,36 +573,36 @@ Boolean SocketDescriptor::tcpReadHandler1(int mask) {
       // Call the appropriate read handler to get the packet data from the TCP stream:
       RTPInterface* rtpInterface = lookupRTPInterface(fStreamChannelId);
       if (rtpInterface != NULL) {
-	if (rtpInterface->fNextTCPReadSize == 0) {
-	  // We've already read all the data for this packet.
-	  break;
-	}
-	if (rtpInterface->fReadHandlerProc != NULL) {
+        if (rtpInterface->fNextTCPReadSize == 0) {
+          // We've already read all the data for this packet.
+          break;
+        }
+        if (rtpInterface->fReadHandlerProc != NULL) {
 #ifdef DEBUG_RECEIVE
-	  fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): reading %d bytes on channel %d\n", fOurSocketNum, rtpInterface->fNextTCPReadSize, rtpInterface->fNextTCPReadStreamChannelId);
+          fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): reading %d bytes on channel %d\n", fOurSocketNum, rtpInterface->fNextTCPReadSize, rtpInterface->fNextTCPReadStreamChannelId);
 #endif
-	  fTCPReadingState = AWAITING_PACKET_DATA;
-	  rtpInterface->fReadHandlerProc(rtpInterface->fOwner, mask);
-	} else {
+          fTCPReadingState = AWAITING_PACKET_DATA;
+          rtpInterface->fReadHandlerProc(rtpInterface->fOwner, mask);
+        } else {
 #ifdef DEBUG_RECEIVE
-	  fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): No handler proc for \"rtpInterface\" for channel %d; need to skip %d remaining bytes\n", fOurSocketNum, fStreamChannelId, rtpInterface->fNextTCPReadSize);
+          fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): No handler proc for \"rtpInterface\" for channel %d; need to skip %d remaining bytes\n", fOurSocketNum, fStreamChannelId, rtpInterface->fNextTCPReadSize);
 #endif
-	  int result = readSocket(fEnv, fOurSocketNum, &c, 1, fromAddress);
-	  if (result < 0) { // error reading TCP socket, so we will no longer handle it
+          int result = readSocket(fEnv, fOurSocketNum, &c, 1, fromAddress);
+          if (result < 0) { // error reading TCP socket, so we will no longer handle it
 #ifdef DEBUG_RECEIVE
-	    fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): readSocket(1 byte) returned %d (error)\n", fOurSocketNum, result);
+            fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): readSocket(1 byte) returned %d (error)\n", fOurSocketNum, result);
 #endif
-	    fReadErrorOccurred = True;
-	    fDeleteMyselfNext = True;
-	    return False;
-	  } else {
-	    fTCPReadingState = AWAITING_PACKET_DATA;
-	    if (result == 1) {
-	      --rtpInterface->fNextTCPReadSize;
-	      callAgain = True;
-	    }
-	  }
-	}
+            fReadErrorOccurred = True;
+            fDeleteMyselfNext = True;
+            return False;
+          } else {
+            fTCPReadingState = AWAITING_PACKET_DATA;
+            if (result == 1) {
+              --rtpInterface->fNextTCPReadSize;
+              callAgain = True;
+            }
+          }
+        }
       }
 #ifdef DEBUG_RECEIVE
       else fprintf(stderr, "SocketDescriptor(socket %d)::tcpReadHandler(): No \"rtpInterface\" for channel %d\n", fOurSocketNum, fStreamChannelId);
@@ -618,7 +618,7 @@ Boolean SocketDescriptor::tcpReadHandler1(int mask) {
 
 tcpStreamRecord
 ::tcpStreamRecord(int streamSocketNum, unsigned char streamChannelId,
-		  tcpStreamRecord* next)
+                  tcpStreamRecord* next)
   : fNext(next),
     fStreamSocketNum(streamSocketNum), fStreamChannelId(streamChannelId) {
 }

@@ -1,0 +1,23 @@
+live555 vc .lib 文件编译方法：
+
+利用 genWindowsMakefiles.cmd 生成 vs 可用的 makefile
+需要修改 TOOLS32 路径
+需要修改 LINK_OPTS_0 变量，msvcirt.lib -> msvcrt.lib
+运行 genWindowsMakefiles.cmd 
+
+建立 build.bat 文件：
+call "C:\Program Files (x86)\Microsoft Visual Studio 8\VC\vcvarsall.bat"
+cd liveMedia
+nmake /B -f liveMedia.mak
+cd ../groupsock
+nmake /B -f groupsock.mak
+cd ../UsageEnvironment
+nmake /B -f UsageEnvironment.mak
+cd ../BasicUsageEnvironment
+nmake /B -f BasicUsageEnvironment.mak
+cd ../testProgs
+nmake /B -f testProgs.mak
+cd ../mediaServer
+nmake /B -f mediaServer.mak
+
+即可编译生成 .lib 文件

@@ -1,8 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
-export PATH=$PWD/../toolchain/arm-linux-gnueabihf-4.8.3/bin:$PATH
 export DESTDIR=$PWD/_install
 
 case "$1" in
@@ -17,6 +16,7 @@ clean)
     make clean
     ;;
 distclean)
-    make distclean
+    make distclean || true
+    rm -rf $PWD/_install $PWD/Makefile
     ;;
 esac

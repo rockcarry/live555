@@ -3,6 +3,7 @@ _install/
 Makefile
 *.o
 *.a
+/hlsProxy/live555HLSProxy
 /mediaServer/live555MediaServer
 /proxyServer/live555ProxyServer
 /testProgs/MPEG2TransportStreamIndexer
@@ -35,4 +36,8 @@ Makefile
 /testProgs/testReplicator
 /testProgs/testWAVAudioStreamer
 /testProgs/vobStreamer
+/testProgs/mikeyParse
+/testProgs/testH264VideoToHLSSegments
+/testProgs/testMKVSplitter
+/testProgs/testMPEG2TransportStreamSplitter
 

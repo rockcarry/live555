@@ -52,7 +52,7 @@ protected:
   H264or5VideoStreamFramer(int hNumber, // 264 or 265
 			   UsageEnvironment& env, FramedSource* inputSource,
 			   Boolean createParser,
-			   Boolean includeStartCodeInOutput, Boolean insertAccessUnitDelimiters);
+			   Boolean includeStartCodeInOutput, Boolean insertAccessUnitDelimiters, double frameRate = 20);
       // We're an abstract base class.
   virtual ~H264or5VideoStreamFramer();
 

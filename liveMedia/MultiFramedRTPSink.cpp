@@ -440,7 +440,7 @@ void MultiFramedRTPSink::sendPacketIfNecessary() {
     // Delay this amount of time:
     nextTask() = envir().taskScheduler().scheduleDelayedTask(uSecondsToGo, (TaskFunc*)sendNext, this);
 #else
-    sendNext(this);
+    nextTask() = envir().taskScheduler().scheduleDelayedTask(0, (TaskFunc*)sendNext, this);
 #endif
   }
 }

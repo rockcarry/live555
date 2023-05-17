@@ -76,8 +76,10 @@ protected:
   unsigned fMaxSize; // in
   unsigned fFrameSize; // out
   unsigned fNumTruncatedBytes; // out
-  struct timeval fPresentationTime; // out
   unsigned fDurationInMicroseconds; // out
+
+public:
+  struct timeval fPresentationTime; // out
 
 private:
   // redefined virtual functions:

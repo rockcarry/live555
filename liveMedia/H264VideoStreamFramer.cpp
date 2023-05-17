@@ -21,17 +21,17 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "H264VideoStreamFramer.hh"
 
 H264VideoStreamFramer* H264VideoStreamFramer
-::createNew(UsageEnvironment& env, FramedSource* inputSource,
+::createNew(UsageEnvironment& env, FramedSource* inputSource, double frameRate,
 	    Boolean includeStartCodeInOutput, Boolean insertAccessUnitDelimiters) {
-  return new H264VideoStreamFramer(env, inputSource, True,
+  return new H264VideoStreamFramer(env, inputSource, frameRate, True,
 				   includeStartCodeInOutput, insertAccessUnitDelimiters);
 }
 
 H264VideoStreamFramer
-::H264VideoStreamFramer(UsageEnvironment& env, FramedSource* inputSource, Boolean createParser,
+::H264VideoStreamFramer(UsageEnvironment& env, FramedSource* inputSource, double frameRate, Boolean createParser,
 			Boolean includeStartCodeInOutput, Boolean insertAccessUnitDelimiters)
   : H264or5VideoStreamFramer(264, env, inputSource, createParser,
-			     includeStartCodeInOutput, insertAccessUnitDelimiters) {
+			     includeStartCodeInOutput, insertAccessUnitDelimiters, frameRate) {
 }
 
 H264VideoStreamFramer::~H264VideoStreamFramer() {

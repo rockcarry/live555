@@ -76,7 +76,7 @@ private:
 H264or5VideoStreamFramer
 ::H264or5VideoStreamFramer(int hNumber, UsageEnvironment& env, FramedSource* inputSource,
 			   Boolean createParser,
-			   Boolean includeStartCodeInOutput, Boolean insertAccessUnitDelimiters)
+			   Boolean includeStartCodeInOutput, Boolean insertAccessUnitDelimiters, double frameRate)
   : MPEGVideoStreamFramer(env, inputSource),
     fHNumber(hNumber), fIncludeStartCodeInOutput(includeStartCodeInOutput),
     fInsertAccessUnitDelimiters(insertAccessUnitDelimiters),
@@ -86,7 +86,7 @@ H264or5VideoStreamFramer
   fParser = createParser
     ? new H264or5VideoStreamParser(hNumber, this, inputSource, includeStartCodeInOutput)
     : NULL;
-  fFrameRate = 30.0; // We assume a frame rate of 30 fps, unless we learn otherwise (from parsing a VPS or SPS NAL unit)
+  fFrameRate = frameRate;
 }
 
 H264or5VideoStreamFramer::~H264or5VideoStreamFramer() {
@@ -127,12 +127,16 @@ void H264or5VideoStreamFramer::saveCopyOfPPS(u_int8_t* from, unsigned size) {
 }
 
 void H264or5VideoStreamFramer::setPresentationTime() {
+#if 0
   if (fPresentationTimeBase.tv_sec == 0 && fPresentationTimeBase.tv_usec == 0) {
     // Set to the current time:
     gettimeofday(&fPresentationTimeBase, NULL);
     fNextPresentationTime = fPresentationTimeBase;
   }
   fPresentationTime = fNextPresentationTime;
+#else
+  fPresentationTime = fInputSource->fPresentationTime;
+#endif
 }
 
 Boolean H264or5VideoStreamFramer::isVPS(u_int8_t nal_unit_type) {
